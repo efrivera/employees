@@ -52,10 +52,6 @@ function Employee(id, name, lastName, email) {
 }
 
 const addEmployee = (id, name, lastName, email) => {
-  // if (!id || !name || !lastName )
-  //   throw new Error('some parameters are empty');
-  // if (id in employees)
-  //   throw new Error(`This id: ${id}, is already used. Try another`);
   const newEmployee = new Employee(id, name, lastName, email);
   employees = {
     ...employees,
@@ -73,18 +69,21 @@ const editEmployee = (id, name = this.name, lastName = this.lastName, email = th
 
 const removeEmployee = (id) => {
   delete employees[id];
+  saveLocalStorage(employees);
 };
 
 const saveLocalStorage = (data) => {
-  let parsedData = [];
-  for (let employee in data)
-    parsedData.push(data[employee]);
+  let dataToStore = [];
+  localStorage.removeItem('employees');
 
-  localStorage.setItem('employees', JSON.stringify(parsedData));
+  for (let employee in data)
+    dataToStore.push(data[employee]);
+
+  localStorage.setItem('employees', JSON.stringify(dataToStore));
 };
 
 (function() {
-  employeesRetrievedData = JSON.parse(localStorage.getItem('employees')) || [];
+  let employeesRetrievedData = JSON.parse(localStorage.getItem('employees')) || [];
   employeesRetrievedData.forEach((element) => {
     addEmployee(element['id'], element['name'], element['lastName'], element['email']);
   });
