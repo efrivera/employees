@@ -1,12 +1,12 @@
 let employees = {};
 
-function Employee(id, name, lastName, email = '', skills = {}) {
-  let salary = {
-    basico: 0,
-    bonos: 0,
-    deducibles: 0,
-    neto: 0,
-  };
+function Employee(id, name, lastName, email = '', skills = {}, salaryVal = {}) {
+  let salary = salaryVal;
+  // {
+  //   basico: 0,
+  //   bonos: 0,
+  //   deducibles: 0,
+  // }
 
   this.name = name;
   this.lastName = lastName;
@@ -14,7 +14,7 @@ function Employee(id, name, lastName, email = '', skills = {}) {
   this.id = id;
   this.skills = skills;
 
-  this.basicInfoEdit = (name = this.name, lastName = this.lastName, email = this.email) => {
+  this.basicInfoEdit = function(name = this.name, lastName = this.lastName, email = this.email) {
     this.name = (name === '' || name === null) ? this.name : name;
     this.lastName = (lastName === '' || lastName === null) ? this.lastName : lastName;
     this.email = (email === '' || email === null) ? this.email : email;
@@ -41,22 +41,26 @@ function Employee(id, name, lastName, email = '', skills = {}) {
     saveLocalStorage(employees);
   };
 
+  this.getSalaryNeto = function() {
+    return salary.basico + salary.bonos - salary.deducibles;
+  };
+
   Object.defineProperty(this, 'salary', {
     get: function() {
       return salary;
     },
     set: function(value) {
-      //value validation
       salary = {
         ...salary,
         ...value,
       };
+      saveLocalStorage(employees);
     }
   });
 }
 
-const addEmployee = (id, name, lastName, email, skills) => {
-  const newEmployee = new Employee(id, name, lastName, email, skills);
+const addEmployee = (id, name, lastName, email, skills, salary) => {
+  const newEmployee = new Employee(id, name, lastName, email, skills, salary);
   employees = {
     ...employees,
     [id]: newEmployee,
@@ -89,7 +93,7 @@ const saveLocalStorage = (data) => {
 (function() {
   let employeesRetrievedData = JSON.parse(localStorage.getItem('employees')) || [];
   employeesRetrievedData.forEach((element) => {
-    addEmployee(element['id'], element['name'], element['lastName'], element['email'], element['skills']);
+    addEmployee(element['id'], element['name'], element['lastName'], element['email'], element['skills'], element['salary']);
   });
 })();
 
